@@ -24,21 +24,29 @@ public class TestCreateUser extends BaseURI {
 
     @Test
     public void checkPositiveUserCreation() {
-        testUserCreation();
+        testCreateUser();
+        testAuthUser();
     }
     @Test
     public void checkNegativeUserCreation() {
+        testCreateUser();
+        testAuthUser();
         testDuplicateUserCreation();
-        testMissingFields();
+        testMissingPassword();
+        testMissingEmail();
+        testMissingName();
     }
-    @Step("Create a user and check the successful creation through the User Auth")
-    public void testUserCreation() {
+    @Step("Checking create user")
+    public void testCreateUser() {
         // Отправляем POST-запрос на создание пользователя
-        createUser.createUser().then().assertThat().body("success", equalTo(true))
+        createUser.createUser().then().assertThat().body("user", notNullValue())
                 .and()
                 .statusCode(200);
-        // Отправляем POST-запрос на авторизацию созданного пользователя - исключаем ложно-положительные тесты
-        authUser.authUser().then().assertThat().body("success", equalTo(true))
+    }
+    @Step("Checking successful auth")
+    public void testAuthUser() {
+        // Отправляем POST-запрос на авторизацию созданного пользователя
+        authUser.authUser().then().assertThat().body("user", notNullValue())
                 .and()
                 .statusCode(200);
         accessToken = authUser.authUser().then().extract().path("accessToken");
@@ -46,30 +54,30 @@ public class TestCreateUser extends BaseURI {
 
     @Step("Check that it is impossible to create two identical users")
     public void testDuplicateUserCreation() {
-        // Отправляем POST-запрос на создание пользователя
-        createUser.createUser().then().assertThat().body("user", notNullValue());
-        // Отправляем POST-запрос на авторизацию созданного пользователя - убеждаемся, что пользователь точно создан
-        authUser.authUser().then().assertThat().body("user", notNullValue());
-        accessToken = authUser.authUser().then().extract().path("accessToken");
-        // Отправляем POST-запрос на создание такого же курьера
+        // Отправляем POST-запрос на создание такого же пользователя
         createUser.createUser().then().assertThat().body("message", equalTo("User already exists"))
                 .and()
                 .statusCode(403);
     }
-
-    @Step("Check that in order to create a courier, you need to fill in all required fields")
-    public void testMissingFields() {
-        // Отправляем POST-запрос на создание курьера без пароля
+    @Step("Check that in order to create a courier, you need to fill password")
+    public void testMissingPassword() {
+        // Отправляем POST-запрос на создание пользователя без пароля
         createUser.createUserWithoutPassword().then()
                 .assertThat().body("message", equalTo("Email, password and name are required fields"))
                 .and()
                 .statusCode(403);
-        // Отправляем POST-запрос на создание курьера без email
+    }
+    @Step("Check that in order to create a courier, you need to fill email")
+    public void testMissingEmail() {
+        // Отправляем POST-запрос на создание пользователя без email
         createUser.createUserWithoutEmail().then()
                 .assertThat().body("message", equalTo("Email, password and name are required fields"))
                 .and()
                 .statusCode(403);
-        // Отправляем POST-запрос на создание курьера без имени
+    }
+    @Step("Check that in order to create a courier, you need to fill name")
+    public void testMissingName() {
+        // Отправляем POST-запрос на создание пользователя без имени
         createUser.createUserWithoutName().then()
                 .assertThat().body("message", equalTo("Email, password and name are required fields"))
                 .and()

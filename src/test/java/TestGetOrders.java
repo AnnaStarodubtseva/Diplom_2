@@ -23,20 +23,34 @@ public class TestGetOrders extends BaseURI {
         deleteUser.deleteUser(accessToken);
     }
     @Test
-    public void checkGetOrderUserWithAuth() { testGetOrdersUserWithAuth(); }
+    public void checkGetOrderUserWithAuth() {
+        testCreateUser();
+        testAuthUser();
+        testGetOrdersUserWithAuth();
+    }
     @Test
-    public void checkGetOrderUserWithoutAuth() { testGetOrdersUserWithoutAuth(); }
-    @Step("Checking the receipt of orders from an authorized user")
-    public void testGetOrdersUserWithAuth() {
+    public void checkGetOrderUserWithoutAuth() {
+        testCreateUser();
+        testAuthUser();
+        testGetOrdersUserWithoutAuth();
+    }
+    @Step("Checking create user")
+    public void testCreateUser() {
         // Отправляем POST-запрос на создание пользователя
         createUser.createUser().then().assertThat().body("user", notNullValue())
                 .and()
                 .statusCode(200);
+    }
+    @Step("Checking successful auth")
+    public void testAuthUser() {
         // Отправляем POST-запрос на авторизацию созданного пользователя
         authUser.authUser().then().assertThat().body("user", notNullValue())
                 .and()
                 .statusCode(200);
         accessToken = authUser.authUser().then().extract().path("accessToken");
+    }
+    @Step("Checking the receipt of orders from an authorized user")
+    public void testGetOrdersUserWithAuth() {
         // Отправляем POST-запрос на создание заказа
         createOrder.createOrderWithAuthAndIngredients(accessToken).then().assertThat().body("success", equalTo(true))
                 .and()
@@ -48,15 +62,6 @@ public class TestGetOrders extends BaseURI {
     }
     @Step("Checking the receipt of orders from an unauthorized user")
     public void testGetOrdersUserWithoutAuth() {
-        // Отправляем POST-запрос на создание пользователя
-        createUser.createUser().then().assertThat().body("user", notNullValue())
-                .and()
-                .statusCode(200);
-        // Отправляем POST-запрос на авторизацию созданного пользователя
-        authUser.authUser().then().assertThat().body("user", notNullValue())
-                .and()
-                .statusCode(200);
-        accessToken = authUser.authUser().then().extract().path("accessToken");
         // Отправляем POST-запрос на создание заказа
         createOrder.createOrderWithAuthAndIngredients(accessToken).then().assertThat().body("success", equalTo(true))
                 .and()

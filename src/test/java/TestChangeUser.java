@@ -25,16 +25,34 @@ public class TestChangeUser extends BaseURI {
         deleteUser.deleteUser(accessToken);
     }
     @Test
-    public void checkChangeDataWithToken() { testChangeUserWithToken(); }
+    public void checkChangeDataWithToken() {
+        testCreateUser();
+        testAuthUser();
+        testChangeUserWithToken();
+    }
     @Test
-    public void checkChangeDataWithoutToken() { testChangeUserWithoutToken(); }
+    public void checkChangeDataWithoutToken() {
+        testCreateUser();
+        testAuthUser();
+        testChangeUserWithoutToken();
+    }
+    @Step("Checking create user")
+    public void testCreateUser() {
+        // Отправляем POST-запрос на создание пользователя
+        createUser.createUser().then().assertThat().body("user", notNullValue())
+                .and()
+                .statusCode(200);
+    }
+    @Step("Checking successful auth")
+    public void testAuthUser() {
+        // Отправляем POST-запрос на авторизацию созданного пользователя
+        authUser.authUser().then().assertThat().body("user", notNullValue())
+                .and()
+                .statusCode(200);
+        accessToken = authUser.authUser().then().extract().path("accessToken");
+    }
     @Step("Checking for changes in user data with a token")
     public void testChangeUserWithToken() {
-        // Отправляем POST-запрос на создание пользователя
-        createUser.createUser().then().assertThat().body("user", notNullValue());
-        // Отправляем POST-запрос на авторизацию созданного пользователя
-        authUser.authUser().then().assertThat().body("user", notNullValue());
-        accessToken = authUser.authUser().then().extract().path("accessToken");
         // Отправляем PATCH-запрос на изменение данных созданного пользователя
         changeUser.changeWithToken(accessToken).then().assertThat().body("success", equalTo(true))
                 .and()
@@ -47,11 +65,6 @@ public class TestChangeUser extends BaseURI {
     }
     @Step("Checking for changes in user data without a token")
     public void testChangeUserWithoutToken() {
-        // Отправляем POST-запрос на создание пользователя
-        createUser.createUser().then().assertThat().body("user", notNullValue());
-        // Отправляем POST-запрос на авторизацию созданного пользователя
-        authUser.authUser().then().assertThat().body("user", notNullValue());
-        accessToken = authUser.authUser().then().extract().path("accessToken");
         //Отправляем PATCH-запрос на изменение данных созданного пользователя
         changeUser.changeWithoutToken().then().assertThat().body("message", equalTo("You should be authorised"))
                 .and()
