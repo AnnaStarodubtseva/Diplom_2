@@ -24,27 +24,42 @@ public class TestCreateUser extends BaseURI {
 
     @Test
     public void checkPositiveUserCreation() {
-        testCreateUser();
-        testAuthUser();
+        createUser();
+        authUser();
     }
     @Test
-    public void checkNegativeUserCreation() {
-        testCreateUser();
-        testAuthUser();
-        testDuplicateUserCreation();
-        testMissingPassword();
-        testMissingEmail();
-        testMissingName();
+    public void checkDuplicateUserCreation() {
+        createUser();
+        authUser();
+        duplicateUserCreation();
+    }
+    @Test
+    public void checkNegativeUserCreationMissingPassword() {
+        createUser();
+        authUser();
+        missingPassword();
+    }
+    @Test
+    public void checkNegativeUserCreationMissingEmail() {
+        createUser();
+        authUser();
+        missingEmail();
+    }
+    @Test
+    public void checkNegativeUserCreationMissingName() {
+        createUser();
+        authUser();
+        missingName();
     }
     @Step("Checking create user")
-    public void testCreateUser() {
+    public void createUser() {
         // Отправляем POST-запрос на создание пользователя
         createUser.createUser().then().assertThat().body("user", notNullValue())
                 .and()
                 .statusCode(200);
     }
     @Step("Checking successful auth")
-    public void testAuthUser() {
+    public void authUser() {
         // Отправляем POST-запрос на авторизацию созданного пользователя
         authUser.authUser().then().assertThat().body("user", notNullValue())
                 .and()
@@ -53,14 +68,14 @@ public class TestCreateUser extends BaseURI {
     }
 
     @Step("Check that it is impossible to create two identical users")
-    public void testDuplicateUserCreation() {
+    public void duplicateUserCreation() {
         // Отправляем POST-запрос на создание такого же пользователя
         createUser.createUser().then().assertThat().body("message", equalTo("User already exists"))
                 .and()
                 .statusCode(403);
     }
     @Step("Check that in order to create a courier, you need to fill password")
-    public void testMissingPassword() {
+    public void missingPassword() {
         // Отправляем POST-запрос на создание пользователя без пароля
         createUser.createUserWithoutPassword().then()
                 .assertThat().body("message", equalTo("Email, password and name are required fields"))
@@ -68,7 +83,7 @@ public class TestCreateUser extends BaseURI {
                 .statusCode(403);
     }
     @Step("Check that in order to create a courier, you need to fill email")
-    public void testMissingEmail() {
+    public void missingEmail() {
         // Отправляем POST-запрос на создание пользователя без email
         createUser.createUserWithoutEmail().then()
                 .assertThat().body("message", equalTo("Email, password and name are required fields"))
@@ -76,7 +91,7 @@ public class TestCreateUser extends BaseURI {
                 .statusCode(403);
     }
     @Step("Check that in order to create a courier, you need to fill name")
-    public void testMissingName() {
+    public void missingName() {
         // Отправляем POST-запрос на создание пользователя без имени
         createUser.createUserWithoutName().then()
                 .assertThat().body("message", equalTo("Email, password and name are required fields"))

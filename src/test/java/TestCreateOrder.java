@@ -22,37 +22,37 @@ public class TestCreateOrder extends BaseURI {
     }
     @Test
     public void checkSuccessfulCreateOrderWithAuthAndIngredients() {
-        testCreateUser();
-        testAuthUser();
-        testSuccessfulCreateOrderWithAuthAndIngredients();
+        createUser();
+        authUser();
+        successfulCreateOrderWithAuthAndIngredients();
     }
     @Test
     public void checkCreateOrderWithoutAuthAndIngredients() {
-        testCreateUser();
-        testAuthUser();
-        testCreateOrderWithoutAuthAndIngredients();
+        createUser();
+        authUser();
+        createOrderWithoutAuthAndIngredients();
     }
     @Test
     public void checkCreateOrderWithAuthWithoutIngredients() {
-        testCreateUser();
-        testAuthUser();
-        testCreateOrderWithAuthWithoutIngredients();
+        createUser();
+        authUser();
+        createOrderWithAuthWithoutIngredients();
     }
     @Test
     public void checkCreateOrderWithAuthWrongHash() {
-        testCreateUser();
-        testAuthUser();
-        testCreateOrderWithAuthWrongHash();
+        createUser();
+        authUser();
+        createOrderWithAuthWrongHash();
     }
     @Step("Checking create user")
-    public void testCreateUser() {
+    public void createUser() {
         // Отправляем POST-запрос на создание пользователя
         createUser.createUser().then().assertThat().body("user", notNullValue())
                 .and()
                 .statusCode(200);
     }
     @Step("Checking successful auth")
-    public void testAuthUser() {
+    public void authUser() {
         // Отправляем POST-запрос на авторизацию созданного пользователя
         authUser.authUser().then().assertThat().body("user", notNullValue())
                 .and()
@@ -60,26 +60,26 @@ public class TestCreateOrder extends BaseURI {
         accessToken = authUser.authUser().then().extract().path("accessToken");
     }
     @Step("Checking successful auth and creating an order with ingredients")
-    public void testSuccessfulCreateOrderWithAuthAndIngredients() {
+    public void successfulCreateOrderWithAuthAndIngredients() {
         createOrder.createOrderWithAuthAndIngredients(accessToken).then().assertThat().body("success", equalTo(true))
                 .and()
                 .statusCode(200);
     }
     @Step("Checking the creation of an order with ingredients without authorization")
-    public void testCreateOrderWithoutAuthAndIngredients() {
+    public void createOrderWithoutAuthAndIngredients() {
         // В коде ошибка - заказ создаётся и без токена, на выходе код 200.
         // В реальном мире это был бы заведённый баг
         // Пришлось изменить на код 200, чтобы собрать отчёт Allur (иначе не собирается), должен быть 401
         createOrder.createOrderWithoutAuth().then().assertThat().statusCode(200);
     }
     @Step("Checking the creation of an order without ingredients")
-    public void testCreateOrderWithAuthWithoutIngredients() {
+    public void createOrderWithAuthWithoutIngredients() {
         createOrder.createOrderWithAuthWithoutIngredients(accessToken).then().assertThat().body("message", equalTo("Ingredient ids must be provided"))
                 .and()
                 .statusCode(400);
     }
     @Step("Checking the creation of an order with wrong hash")
-    public void testCreateOrderWithAuthWrongHash() {
+    public void createOrderWithAuthWrongHash() {
         createOrder.createOrderWithAuthWrongHash(accessToken).then().assertThat().statusCode(500);
     }
 }

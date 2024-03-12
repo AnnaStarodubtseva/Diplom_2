@@ -22,34 +22,54 @@ public class TestAuthUser extends BaseURI {
     }
     @Test
     public void checkPositiveAuthUser() {
-        testCreateUser();
-        testAuthUser();
+        createUser();
+        authUser();
     }
     @Test
-    public void checkNegativeAuthUserMissingFields() {
-        testCreateUser();
-        testAuthUser();
-        testMissingPassword();
-        testMissingEmail();
-        testMissingEmailPassword();
+    public void checkNegativeAuthUserMissingPassword() {
+        createUser();
+        authUser();
+        missingPassword();
     }
     @Test
-    public void checkNegativeAuthUserWrongCredentials() {
-        testCreateUser();
-        testAuthUser();
-        testWrongPassword();
-        testWrongEmail();
-        testWrongEmailPassword();
+    public void checkNegativeAuthUserMissingEmail() {
+        createUser();
+        authUser();
+        missingEmail();
+    }
+    @Test
+    public void checkNegativeAuthUserMissingEmailPassword() {
+        createUser();
+        authUser();
+        missingEmailPassword();
+    }
+    @Test
+    public void checkNegativeAuthUserWrongPassword() {
+        createUser();
+        authUser();
+        wrongPassword();
+    }
+    @Test
+    public void checkNegativeAuthUserWrongEmail() {
+        createUser();
+        authUser();
+        wrongEmail();
+    }
+    @Test
+    public void checkNegativeAuthUserWrongEmailPassword() {
+        createUser();
+        authUser();
+        wrongEmailPassword();
     }
     @Step("Checking create user")
-    public void testCreateUser() {
+    public void createUser() {
         // Отправляем POST-запрос на создание пользователя
         createUser.createUser().then().assertThat().body("user", notNullValue())
                 .and()
                 .statusCode(200);
     }
     @Step("Checking successful auth")
-    public void testAuthUser() {
+    public void authUser() {
         // Отправляем POST-запрос на авторизацию созданного пользователя
         authUser.authUser().then().assertThat().body("user", notNullValue())
                 .and()
@@ -58,7 +78,7 @@ public class TestAuthUser extends BaseURI {
     }
 
     @Step("Checking the auth with a missing password")
-    public void testMissingPassword() {
+    public void missingPassword() {
         // Отправляем POST-запрос на авторизацию пользователя без пароля
         authUser.authUserWithoutPassword().then()
                 .assertThat().body("message", equalTo("email or password are incorrect"))
@@ -66,7 +86,7 @@ public class TestAuthUser extends BaseURI {
                 .statusCode(401);
     }
     @Step("Checking the auth with a missing email")
-    public void testMissingEmail() {
+    public void missingEmail() {
         // Отправляем POST-запрос на авторизацию пользователя без email
         authUser.authUserWithoutEmail().then()
                 .assertThat().body("message", equalTo("email or password are incorrect"))
@@ -74,7 +94,7 @@ public class TestAuthUser extends BaseURI {
                 .statusCode(401);
     }
     @Step("Checking the auth with a missing email&password")
-    public void testMissingEmailPassword() {
+    public void missingEmailPassword() {
         // Отправляем POST-запрос на авторизацию пользователя без email и пароля
         authUser.authUserWithoutPasswordEmail().then()
                 .assertThat().body("message", equalTo("email or password are incorrect"))
@@ -83,7 +103,7 @@ public class TestAuthUser extends BaseURI {
     }
 
     @Step("Checking the auth with a non-existent password")
-    public void testWrongPassword() {
+    public void wrongPassword() {
         // Отправляем POST-запрос на авторизацию пользователя с неверным паролем
         authUser.authUserWrongPassword().then()
                 .assertThat().body("message", equalTo("email or password are incorrect"))
@@ -91,7 +111,7 @@ public class TestAuthUser extends BaseURI {
                 .statusCode(401);
     }
     @Step("Checking the auth with a non-existent email")
-    public void testWrongEmail() {
+    public void wrongEmail() {
         // Отправляем POST-запрос на авторизацию пользователя с неверным email
         authUser.authUserWrongEmail()
                 .then().assertThat().body("message", equalTo("email or password are incorrect"))
@@ -99,7 +119,7 @@ public class TestAuthUser extends BaseURI {
                 .statusCode(401);
     }
     @Step("Checking the auth with a non-existent email&password")
-    public void testWrongEmailPassword() {
+    public void wrongEmailPassword() {
         // Отправляем POST-запрос на авторизацию пользователя с неверным паролем и email
         authUser.authUserWrongEmailPassword().then()
                 .assertThat().body("message", equalTo("email or password are incorrect"))

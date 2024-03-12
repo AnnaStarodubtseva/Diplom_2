@@ -26,25 +26,25 @@ public class TestChangeUser extends BaseURI {
     }
     @Test
     public void checkChangeDataWithToken() {
-        testCreateUser();
-        testAuthUser();
-        testChangeUserWithToken();
+        createUser();
+        authUser();
+        changeUserWithToken();
     }
     @Test
     public void checkChangeDataWithoutToken() {
-        testCreateUser();
-        testAuthUser();
-        testChangeUserWithoutToken();
+        createUser();
+        authUser();
+        changeUserWithoutToken();
     }
     @Step("Checking create user")
-    public void testCreateUser() {
+    public void createUser() {
         // Отправляем POST-запрос на создание пользователя
         createUser.createUser().then().assertThat().body("user", notNullValue())
                 .and()
                 .statusCode(200);
     }
     @Step("Checking successful auth")
-    public void testAuthUser() {
+    public void authUser() {
         // Отправляем POST-запрос на авторизацию созданного пользователя
         authUser.authUser().then().assertThat().body("user", notNullValue())
                 .and()
@@ -52,7 +52,7 @@ public class TestChangeUser extends BaseURI {
         accessToken = authUser.authUser().then().extract().path("accessToken");
     }
     @Step("Checking for changes in user data with a token")
-    public void testChangeUserWithToken() {
+    public void changeUserWithToken() {
         // Отправляем PATCH-запрос на изменение данных созданного пользователя
         changeUser.changeWithToken(accessToken).then().assertThat().body("success", equalTo(true))
                 .and()
@@ -64,7 +64,7 @@ public class TestChangeUser extends BaseURI {
         assertEquals(expectResult, actualResult);
     }
     @Step("Checking for changes in user data without a token")
-    public void testChangeUserWithoutToken() {
+    public void changeUserWithoutToken() {
         //Отправляем PATCH-запрос на изменение данных созданного пользователя
         changeUser.changeWithoutToken().then().assertThat().body("message", equalTo("You should be authorised"))
                 .and()
